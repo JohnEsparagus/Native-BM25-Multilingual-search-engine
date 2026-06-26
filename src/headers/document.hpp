@@ -15,7 +15,7 @@ public:
 
 class Engine{
 public:
-    size_t avg_doc_len;
+    double avg_doc_len;
     size_t total_docs;
     size_t doc_frequency;
 
