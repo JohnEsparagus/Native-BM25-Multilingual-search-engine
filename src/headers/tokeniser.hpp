@@ -3,9 +3,9 @@
 #include <string>
 #include <string_view>
 
-void fast_lower(std::string& doc);
+std::string fast_lower(std::string& doc);
 
 
-std::vector<std::string_view> tokenise(std::string& doc);
+std::vector<std::string> tokenise(std::string& doc);
 
 

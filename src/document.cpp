@@ -1,7 +1,8 @@
 #include "headers/document.hpp"
 #include "headers/tokeniser.hpp"
+#include "document.hpp"
 
-Document::Document(std::string& content, size_t doc_id){
+Document::Document(const std::string& content, size_t doc_id){
     id = doc_id;
     len = 0;
 
@@ -70,5 +71,25 @@ void Engine::print_engine(){
         doc.print_doc(); // Calls the Document member print function
     }
     std::cout << "=====================\n";
-    
+}
+std::vector<std::pair<size_t, double>> Engine::query(const std::string &query_text) const
+{
+    return std::vector<std::pair<size_t, double>>();
+}
+void InvertedIndex::add_doc(const Document &doc)
+{
+}
+
+size_t InvertedIndex::get_doc_freq(const std::string &term) const
+{
+    return size_t();
+}
+
+const std::vector<Posting>* get_postings(const std::string& term) const{
+
+}
+
+double Scorer::score_term(const std::string &term, size_t term_freq_in_doc, size_t doc_len) const
+{
+    return 0.0;
 }
