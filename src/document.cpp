@@ -1,44 +1,38 @@
 #include "headers/document.hpp"
 #include "headers/tokeniser.hpp"
-#include "document.hpp"
 
-Document::Document(const std::string& content, size_t doc_id){
+Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id){
     id = doc_id;
-    len = 0;
-
-    auto tokens = tokenise(content);
+    len = tokens.size();
 
     for (auto& token : tokens){
         term_freq[std::string(token)]++;
-        len++;
     }
 }
 
-void Engine::build_index(std::vector<std::string> corpus){
+void Engine::add_doc(const std::string& text)
+{
+    size_t new_id  = docs_.size();
+    
+    std::vector<std::string> tokens = tokenise(text); //std vec string
+    std::vector<std::string_view> tokens_view(tokens.begin(), tokens.end());
 
-    int id = 0;
-    size_t total_len = 0;
-    for (auto& doc : corpus){
-        docs.emplace_back(doc,id);
-        id++;
+    docs_.emplace_back(std::move(tokens_view), new_id);
+    index_.add_doc(docs_.back());
 
-        total_len += docs.back().len;
-
-        for (auto& [term, freq] : docs.back().term_freq) doc_freq[term]++;
-    }
-
-    total_docs = docs.size();
-    avg_doc_len = static_cast<double>(total_len) / total_docs;
 }
 
+void Engine::build_index(std::vector<std::string>& corpus){
+
+    docs_.clear();
+    docs_.reserve(corpus.size());
+    
+    for (auto& text : corpus){
+        add_doc(text); //engine
+    }
 
 
-
-
-
-
-
-
+}
 
 
 
@@ -57,18 +51,17 @@ void Document::print_doc() const {
 }
 void Engine::print_engine(){
     std::cout << "=== Engine Status ===\n";
-    std::cout << "Total Docs: " << total_docs << "\n";
-    std::cout << "Avg Doc Length: " << avg_doc_len << "\n";
-    std::cout << "Doc Frequency Variable: " << doc_frequency << "\n";
-    
+    std::cout << "Total Docs: " << total_docs() << "\n";
+    std::cout << "Avg Doc Length: " << average_doc_len() << "\n";
+
     std::cout << "\nGlobal Document Frequencies:\n";
-    for (const auto& [word, freq] : doc_freq) {
-        std::cout << "  - " << word << ": " << freq << "\n";
+    for (const auto& [word, postings] : index_.index) {
+        std::cout << "  - " << word << ": " << postings.size() << "\n";
     }
 
     std::cout << "\nStored Documents Details:\n";
-    for (const auto& doc : docs) {
-        doc.print_doc(); // Calls the Document member print function
+    for (const auto& doc : docs_) {
+        doc.print_doc();
     }
     std::cout << "=====================\n";
 }
@@ -78,15 +71,32 @@ std::vector<std::pair<size_t, double>> Engine::query(const std::string &query_te
 }
 void InvertedIndex::add_doc(const Document &doc)
 {
+    if (doc.id != doc_len.size()){
+        throw std::logic_error("InvertedIndex::add_doc: doc.id must equal current doc count");
+    }
+
+    doc_len.push_back(doc.len);
+    total_len+=doc.len;
+
+    //what doc ids and times the string is references. using tokens
+    for (const auto& [word, freq] : doc.term_freq){
+        index[word].push_back(Posting{doc.id, freq});
+    }
 }
 
 size_t InvertedIndex::get_doc_freq(const std::string &term) const
 {
-    return size_t();
+    auto it = index.find(term);
+    if (it != index.end() ){
+        return it->second.size();
+    } else {return 0;}
 }
 
-const std::vector<Posting>* get_postings(const std::string& term) const{
-
+ const std::vector<Posting>* InvertedIndex::get_postings(const std::string& term) const{
+    auto it = index.find(term);
+    if (it != index.end()){
+        return &it->second;
+    } else {return nullptr;}
 }
 
 double Scorer::score_term(const std::string &term, size_t term_freq_in_doc, size_t doc_len) const

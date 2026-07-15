@@ -10,29 +10,28 @@ std::vector<std::string> corpus = {
 //assume corpus is like, every text is a file, but rn a string
 
 
-//inverted mapping
-/*
 int idf_score(){
-
+    return 0;
 }
 
 int length_norm(){
-
+    return 0;
 }
 
 int tf_boost(){
-    
+    return 0;
 }
 
-int bm25_value(int index, int term, size_t doc_id, int tf){
+int bm25_value(const std::string& term, size_t term_freq_in_doc, size_t doc_len){
     
+    return 0;
 }
-*/
 
 int main(){
     Engine engine;
     engine.build_index(corpus);
     engine.print_engine();
+
 
     
 

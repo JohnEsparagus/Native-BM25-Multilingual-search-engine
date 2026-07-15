@@ -1,6 +1,6 @@
 #include "headers/tokeniser.hpp"
 
-std::string fast_lower(std::string& doc){
+std::string fast_lower(const std::string& doc){
     std::string out = doc;
     for (char &c : out){
         if (c >= 'A' && c <= 'Z') c+=32;
@@ -9,7 +9,7 @@ std::string fast_lower(std::string& doc){
 }
 
 
-std::vector<std::string> tokenise(std::string& doc){
+std::vector<std::string> tokenise(const std::string& doc){
     std::string lowered = fast_lower(doc);
     std::vector<std::string> tokens;
 

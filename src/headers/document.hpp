@@ -4,12 +4,17 @@
 #include <vector>
 #include <iostream>
 
+struct Posting{
+    size_t doc_id;
+    size_t term_freq;
+};
+
 struct Document{
     size_t id;
     size_t len;
     std::unordered_map<std::string, size_t> term_freq;
 
-    Document(const std::string& content, size_t doc_id);
+    Document(const std::vector<std::string_view>& tokens, size_t doc_id);
     void print_doc() const;
 };
 
@@ -35,26 +40,26 @@ struct InvertedIndex{
     size_t get_doc_freq(const std::string& term) const;
     const std::vector<Posting>* get_postings(const std::string& term) const;
 
+    private:
+    size_t total_len = 0;
 
-};
-
-struct Posting{
-    size_t doc_id;
-    size_t term_freq;
 };
 
 struct Scorer{
-    const InvertedIndex& index;
     explicit Scorer(const InvertedIndex& index);
 
     double score_term(const std::string& term, size_t term_freq_in_doc, size_t doc_len) const;
+    private:
+    const InvertedIndex& index;
 };
 
 
 class Engine{
 public:
-    std::vector<Document> docs;
-    InvertedIndex index; 
+
+
+    size_t total_docs() const { return docs_.size();}
+    double average_doc_len()const {return index_.get_avg_doc_len();}
 
     void add_doc(const std::string& text);
     void build_index(std::vector<std::string>& corpus);
@@ -62,6 +67,9 @@ public:
 
     std::vector<std::pair<size_t,double>> query(const std::string& query_text) const;
 
+    private:
+    std::vector<Document> docs_;
+    InvertedIndex index_; 
 
 
 };
