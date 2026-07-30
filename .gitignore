@@ -21,3 +21,5 @@ Makefile
 *.swp
 *.swo
 .DS_Store
+
+.txt
