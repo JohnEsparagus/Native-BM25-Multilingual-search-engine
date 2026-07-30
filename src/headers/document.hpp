@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
-
+#include <cmath>
+#include <filesystem>
+#include <fstream>
 struct Posting{
     size_t doc_id;
     size_t term_freq;
@@ -23,19 +25,14 @@ struct InvertedIndex{
 
     std::vector<size_t> doc_len; //0 -> N
     size_t total_docs() const {return doc_len.size();}
-
+    void clear();
     
-    double get_avg_doc_len() const{
-        if (doc_len.empty()) return 0.0;    
-        double total_len = 0;
-        double avg_doc_len = 0;
-        for (const int len : doc_len){
-            total_len+= len;
-        }
-        avg_doc_len = static_cast<double>(total_len) / doc_len.size();
-        return avg_doc_len;
-    }
+    double get_avg_doc_len() const {
+        if (doc_len.empty())
+            return 0.0;
 
+        return static_cast<double>(total_len) / doc_len.size();
+    }
     void add_doc(const Document& doc);
     size_t get_doc_freq(const std::string& term) const;
     const std::vector<Posting>* get_postings(const std::string& term) const;
@@ -54,6 +51,8 @@ struct Scorer{
 };
 
 
+
+
 class Engine{
 public:
 
@@ -65,11 +64,24 @@ public:
     void build_index(std::vector<std::string>& corpus);
     void print_engine();
 
-    std::vector<std::pair<size_t,double>> query(const std::string& query_text) const;
+    void clear();
+
+    void print_query(const std::string &query_text) const;
+
+    std::vector<double> query(const std::string& query_text) const;
+
+
 
     private:
     std::vector<Document> docs_;
     InvertedIndex index_; 
 
+
+};
+
+
+class TextLoader{
+public:
+    void load_codex(std::filesystem::path& path, Engine& engine);
 
 };

@@ -1,7 +1,6 @@
 #include "headers/bm25.hpp"
 #include "headers/document.hpp"
 
-
 std::vector<std::string> corpus = {
     "The quick brown fox jumps over the lazy dog",
     "A brown fox is fast and furious, but the lazy dog is sleeping in the grass today",
@@ -22,15 +21,18 @@ int tf_boost(){
     return 0;
 }
 
-int bm25_value(const std::string& term, size_t term_freq_in_doc, size_t doc_len){
-    
-    return 0;
-}
+
 
 int main(){
     Engine engine;
-    engine.build_index(corpus);
-    engine.print_engine();
+    TextLoader loader;
+    std::filesystem::path path = "/home/john/Coding/Native-BM25-Multilingual-search-engine/corpus";
+    loader.load_codex(path, engine);
+    //engine.print_engine();
+
+
+    //engine.print_engine();
+    
 
 
     
