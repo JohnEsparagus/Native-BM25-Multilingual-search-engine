@@ -29,10 +29,16 @@ int main(){
     std::filesystem::path path = "/home/john/Coding/Native-BM25-Multilingual-search-engine/corpus";
     loader.load_codex(path, engine);
     //engine.print_engine();
+std::string input;
+while (true) {
+    std::cout << "Enter something: ";
+    std::getline(std::cin, input); 
 
+    // Pass the user's input variable into the function
+    engine.print_query(input);
+    std::cout << "You typed: " << input << "\n";
+}
 
-    //engine.print_engine();
-    
 
 
     

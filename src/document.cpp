@@ -1,23 +1,24 @@
 #include "headers/document.hpp"
 #include "headers/tokeniser.hpp"
 
-Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id){
+Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id, std::string title){
     id = doc_id;
     len = tokens.size();
+    this->title = std::move(title); //
 
     for (auto& token : tokens){
         term_freq[std::string(token)]++;
     }
 }
 
-void Engine::add_doc(const std::string& text)
+void Engine::add_doc(const std::string& text, std::string title)
 {
     size_t new_id  = docs_.size();
     
-    std::vector<std::string> tokens = tokenise(text); //std vec string
+    std::vector<std::string> tokens = tokenise_and_stem(text); //std vec string
     std::vector<std::string_view> tokens_view(tokens.begin(), tokens.end());
 
-    docs_.emplace_back(std::move(tokens_view), new_id);
+    docs_.emplace_back(std::move(tokens_view), new_id, std::move(title));
     index_.add_doc(docs_.back());
 
 }
@@ -28,7 +29,7 @@ void Engine::build_index(std::vector<std::string>& corpus){
     docs_.reserve(corpus.size());
     
     for (auto& text : corpus){
-        add_doc(text); 
+        add_doc(text, "test"); 
     }
 
 
@@ -74,29 +75,27 @@ void Engine::clear(){
 
 void Engine::print_query(const std::string& query_text) const
 {
+
     auto scores = query(query_text);
 
     std::cout << "\n=== Query ===\n";
     std::cout << "Query: \"" << query_text << "\"\n\n";
 
-    for (size_t id = 0; id < scores.size(); ++id)
-    {
-        if (scores[id] > 0.0)
-        {
-            std::cout << "Doc " << id
-                      << " -> Score: "
-                      << scores[id] << '\n';
+    for (size_t id = 0; id < scores.size(); ++id) {
+        if (scores[id] > 0.0) {
+            std::cout << title_of(id)
+                      << " (Doc " << id << ")"
+                      << " -> Score: " << scores[id] << '\n';
         }
     }
 
     std::cout << "=====================\n";
 }
-
     std::vector<double> Engine::query(const std::string &query_text) const
 {
-
     Scorer scorer(index_);
-    std::vector<std::string> tokens = tokenise(query_text);
+    std::vector<std::string> tokens = tokenise_and_stem(query_text);
+    
 
     std::vector<double> scores(index_.total_docs(),0.0);
 
@@ -155,29 +154,31 @@ size_t InvertedIndex::get_doc_freq(const std::string &term) const
 
 Scorer::Scorer(const InvertedIndex& idx) : index(idx){}
 
-double Scorer::score_term(const std::string &term, size_t term_freq_in_doc, size_t doc_len) const
-{
-    double k1 = 1.2;
-    double b = 0.75;
+#include <iostream> // Ensure this header is included at the top of your file
 
-    double N = index.total_docs();
-    double df = index.get_doc_freq(term);
-    double avgdl = index.get_avg_doc_len();
+double Scorer::score_term(const std::string &term, size_t term_freq_in_doc, size_t doc_len) const {     
+    double k1 = 1.2;     
+    double b = 0.75;      
+    
+    double N = index.total_docs();     
+    double df = index.get_doc_freq(term);     
+    double avgdl = index.get_avg_doc_len();      
+    
 
-    if (df == 0){
-        return 0.0;
-    }
+    if (df == 0){         
+        return 0.0;     
+    }      
 
-    const double idf = std::log(1.0+ (N-df + 0.5)/(df + 0.5));
+    const double idf = std::log(1.0 + (N - df + 0.5) / (df + 0.5));      
+    const double length_normalization = (1 - b) + b * (doc_len / avgdl);      
+    const double tf_saturation = (term_freq_in_doc * (k1 + 1)) / (term_freq_in_doc + k1 * length_normalization);        
+    
+    double final_score = idf * tf_saturation;
 
-    const double length_normalization = (1-b)+ b*(doc_len / avgdl);
 
-    const double tf_saturation = (term_freq_in_doc *  (k1+1)) / (term_freq_in_doc + k1 * length_normalization);
-
-
-
-    return idf *  tf_saturation ;
+    return final_score; 
 }
+
 
 namespace fs = std::filesystem;
 void TextLoader::load_codex(std::filesystem::path& path, Engine& engine) {
@@ -195,7 +196,7 @@ void TextLoader::load_codex(std::filesystem::path& path, Engine& engine) {
                         content.resize(size);
                         file.seekg(0, std::ios::beg);
                         if (file.read(content.data(), size)){
-                            engine.add_doc(content);
+                            engine.add_doc(content, text.path().filename().string());
                         }
                     }
                     else{

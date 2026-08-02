@@ -6,6 +6,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+
 struct Posting{
     size_t doc_id;
     size_t term_freq;
@@ -15,8 +16,9 @@ struct Document{
     size_t id;
     size_t len;
     std::unordered_map<std::string, size_t> term_freq;
+    std::string title;
 
-    Document(const std::vector<std::string_view>& tokens, size_t doc_id);
+    Document(const std::vector<std::string_view>& tokens, size_t doc_id, std::string title);
     void print_doc() const;
 };
 
@@ -60,7 +62,9 @@ public:
     size_t total_docs() const { return docs_.size();}
     double average_doc_len()const {return index_.get_avg_doc_len();}
 
-    void add_doc(const std::string& text);
+    void add_doc(const std::string& text, std::string title);
+    const std::string& title_of(size_t doc_id) const { return docs_[doc_id].title; }
+
     void build_index(std::vector<std::string>& corpus);
     void print_engine();
 
