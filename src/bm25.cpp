@@ -25,23 +25,29 @@ int tf_boost(){
 
 int main(){
     Engine engine;
-    TextLoader loader;
     std::filesystem::path path = "/home/john/Coding/Native-BM25-Multilingual-search-engine/corpus";
-    loader.load_codex(path, engine);
-    //engine.print_engine();
-std::string input;
-while (true) {
-    std::cout << "Enter something: ";
-    std::getline(std::cin, input); 
-
-    // Pass the user's input variable into the function
-    engine.print_query(input);
-    std::cout << "You typed: " << input << "\n";
-}
-
-
-
+    std::filesystem::path index_path = "storage/index.bin";
     
+    if (std::filesystem::exists(index_path) && !std::filesystem::is_empty(index_path))// && Storage::is_valid_index(index_path) doesnt work idk why
+    {
+        std::cout << "Loading existing index...\n";
+        Storage::load(engine, index_path);
+    }
+    else
+    {
+        std::cout << "Index not found or invalid. Building new index...\n";
+        TextLoader loader;
+        loader.load_codex(path, engine);
+        Storage::save(engine, index_path);
+        }
+    std::string input;
+    while (true) {
+        std::cout << "Enter something: ";
+        std::getline(std::cin, input); 
 
+        // Pass the user's input clearvariable into the function
+        engine.print_query(input);
+        std::cout << "You typed: " << input << "\n";
+    }
 
 }

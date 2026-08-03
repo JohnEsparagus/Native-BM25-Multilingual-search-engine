@@ -77,9 +77,19 @@ void Engine::print_query(const std::string& query_text) const
 {
 
     auto scores = query(query_text);
+    
 
     std::cout << "\n=== Query ===\n";
     std::cout << "Query: \"" << query_text << "\"\n\n";
+
+    //radix sort
+
+    std::sort(scores.begin(), scores.end(), std::greater<double>());
+    //radix sort scores
+    //sort results
+
+
+    //sort results
 
     for (size_t id = 0; id < scores.size(); ++id) {
         if (scores[id] > 0.0) {

@@ -6,6 +6,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <algorithm>
 
 struct Posting{
     size_t doc_id;
@@ -39,6 +40,9 @@ struct InvertedIndex{
     size_t get_doc_freq(const std::string& term) const;
     const std::vector<Posting>* get_postings(const std::string& term) const;
 
+
+    size_t total_length() const{return total_len;}
+    void set_total_length (size_t len){total_len = len;}
     private:
     size_t total_len = 0;
 
@@ -74,7 +78,12 @@ public:
 
     std::vector<double> query(const std::string& query_text) const;
 
+    //getters
+    InvertedIndex& index(){return index_;}
+    const InvertedIndex& index() const {return index_;}
 
+    std::vector<Document>& documents() {return docs_;}
+    const std::vector<Document>& documents() const {return docs_;}
 
     private:
     std::vector<Document> docs_;

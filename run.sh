@@ -24,9 +24,11 @@ fi
 
 # Compile the project
 echo "Compiling project..."
-make
+cmake --build . --parallel $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+
+cd ..
 
 # Run the executable
 echo "Running $EXEC_NAME..."
 echo "-----------------------------------"
-./"$EXEC_NAME" "$@"
+./build/"$EXEC_NAME" "$@"
