@@ -1,0 +1,93 @@
+define stem
+  (
+    = x
+    # cursor
+    = y
+    # cursor
+    try
+      literal 'a'
+    ==
+    # name x
+      cursor
+    ==
+    # name y
+      cursor
+    >=
+    # limit
+      cursor
+    >=
+    # limit
+      cursor
+    >=
+    # limit
+      cursor
+    >=
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    <
+    # limit
+      cursor
+    [
+    substring
+    ]
+    among
+      literal 'a'
+      (
+        <- ''
+        next
+      literal 'b'
+      (
+        <- ''
+        next
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    >=
+    # number 1
+      name x
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    <=
+    # number 0
+      name y
+    ==
+    # name y
+      name x
+    Function end

@@ -1,0 +1,76 @@
+// Test no-op commands which should get canonicalised.
+externals (stem)
+integers (x y)
+booleans (b)
+strings (s)
+define stem as (
+  $x = 0
+  [substring] among ( // All actions equivalent to `true`.
+    '0' ()
+    'a' (())
+    'b' (true)
+    'c' ('')
+    'd' (loop 0 next)
+    'e' (loop -1 next)
+    'f' (hop 0)
+    'g' ($x += 0)
+    'h' ($x -= 0)
+    'i' ($x *= 1)
+    'j' ($x /= 1)
+    'k' ($x = x)
+    'l' (atmark cursor)
+    'm' (tomark cursor)
+    'n' (among (''))
+    'o' (substring among (''))
+    'p' (among ('' (atmark cursor)))
+    'q' (substring atmark cursor among (''))
+    'r' (substring atmark cursor among ('' (atmark cursor)))
+    's' (insert '')
+    't' (attach '')
+
+    // Values set are unused.
+    'aa' ($y = 1)
+    'ab' ($y += 1)
+    'ac' ($y -= 1)
+    'ad' ($y *= 2)
+    'ae' ($y /= 2)
+    'af' (setmark y)
+    'ag' (set b)
+    'ah' (unset b)
+    'ai' (-> s)
+
+    // Integer tests.
+    'A' ($(1 == 1))
+    'B' ($(2 > 1))
+    'C' ($(-1 < 0))
+    'D' ($(-1 <= -1))
+    'E' ($(0 >= 0))
+    'F' ($(1 != 0))
+  )
+
+  // `setlimit tomark limit for X` is equivalent to just `X`.
+  setlimit tomark limit for 'X'
+
+  [substring] among ( // All actions equivalent to `false`.
+    '0' (false)
+    'a' (fail ())
+    'b' (fail true)
+    'c' (fail '')
+    'd' (fail loop 0 next)
+    'e' (fail loop -1 next)
+    'f' (fail hop 0)
+    'g' (fail $x += 0)
+    'h' (fail $x -= 0)
+    'i' (fail $x *= 1)
+    'j' (fail $x /= 1)
+
+    // Integer tests which are always false.
+    'A' ($(1 != 1))
+    'B' ($(1 > 2))
+    'C' ($(-1 > 0))
+    'D' ($(0 <= -1))
+    'E' ($(0 >= 1))
+    'F' ($(1 == 0))
+  )
+)
+

@@ -1,0 +1,39 @@
+define stem
+  (
+    = y
+    # number 0
+    = x
+    # size
+    = x
+    # number 0
+    = x
+    # neg
+      name x
+    += y
+    # name x
+    = y
+    # neg
+      name y
+    = x
+    # neg
+      size
+    += y
+    # name x
+    = x
+    # neg
+      size
+    += y
+    # name x
+    = x
+    # neg
+      size
+    += y
+    # name x
+    += y
+    # number 1
+    -= y
+    # number 1
+    ==
+    # number 1
+      name y
+    Function end

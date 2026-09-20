@@ -1,0 +1,51 @@
+// Test `attach` and `insert`.
+
+externals (stem)
+
+define stem as (
+  ='abcd'
+  do (
+    hop 2
+    attach '-'
+    $(cursor == 2) or fail='forwards attach changed cursor'
+    next
+  )
+  $(cursor == 0) or fail='do failed to restore cursor after forwards attach'
+  test ('ab-cd' atlimit) or fail='attach failed to update correctly'
+
+  ='abcd'
+  do (
+    hop 2
+    insert '-'
+    $(cursor == 3) or fail='forwards insert failed to move cursor'
+    next
+  )
+  $(cursor == 0) or fail='do failed to restore cursor after forwards insert'
+  test ('ab-cd' atlimit) or fail='insert failed to update correctly'
+
+  ='abcd'
+  backwards (
+    do (
+      hop 2
+      attach '-'
+      $(cursor == 3) or fail='backwards attach failed to move cursor'
+      next
+    )
+    $(cursor == size) or fail='do failed to restore cursor after backwards attach'
+   )
+  test ('ab-cd' atlimit) or fail='attach failed to update correctly'
+
+  ='abcd'
+  backwards (
+    do (
+      hop 2
+      insert '-'
+      $(cursor == 2) or fail='backwards insert moved cursor'
+      next
+    )
+    $(cursor == size) or fail='do failed to restore cursor after backwards insert'
+  )
+  test ('ab-cd' atlimit) or fail='insert failed to update correctly'
+
+  ='ok'
+)

@@ -9,24 +9,38 @@ std::vector<std::string> corpus = {
 //assume corpus is like, every text is a file, but rn a string
 
 
-int idf_score(){
-    return 0;
-}
-
-int length_norm(){
-    return 0;
-}
-
-int tf_boost(){
-    return 0;
-}
-
 
 
 int main(){
     Engine engine;
-    std::filesystem::path path = "/home/john/Coding/Native-BM25-Multilingual-search-engine/corpus";
-    std::filesystem::path index_path = "storage/index.bin";
+    std::filesystem::path path = "./corpus";
+    // path could be english, chinese or etc
+
+    std::cout << "Select which language you would like to parse...\n 1 = English.\n 2 = Chinese.\n 3 = Arabic.\n";
+    char choice = 0;
+
+    while (std::cin>>choice && (choice < '1' || choice > '3')){
+        std::cout<<"Invalid input, choose between the following:\n 1 (English),\n 2 (Chinese),\n 3 (Arabic)";
+    }
+
+    std::filesystem::path index_path_english = "storage/index_english.bin";
+    std::filesystem::path index_path_chinese = "storage/index_chinese.bin";
+    std::filesystem::path index_path_arabic = "storage/index_arabic.bin";
+
+    std::filesystem::path index_path = {};
+
+    if (choice == '1'){
+        path /= "english_docs";
+        index_path = index_path_english;
+    } else if (choice == '2'){
+        path /= "chinese_docs";
+        index_path = index_path_chinese;
+
+    } else if (choice == '3'){
+        path /= "arabic_docs";
+        index_path = index_path_arabic;
+    }
+
     
     if (std::filesystem::exists(index_path) && !std::filesystem::is_empty(index_path))// && Storage::is_valid_index(index_path) doesnt work idk why
     {
@@ -36,18 +50,23 @@ int main(){
     else
     {
         std::cout << "Index not found or invalid. Building new index...\n";
+
         TextLoader loader;
         loader.load_codex(path, engine);
         Storage::save(engine, index_path);
         }
     std::string input;
+
+    std::cin.ignore();
     while (true) {
         std::cout << "Enter something: ";
         std::getline(std::cin, input); 
 
+
         // Pass the user's input clearvariable into the function
         engine.print_query(input);
         std::cout << "You typed: " << input << "\n";
+        
     }
 
 }

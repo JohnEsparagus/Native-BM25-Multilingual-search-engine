@@ -1,0 +1,52 @@
+.DS_Store
+*.exe
+*.o
+# Created by `setup_runtime_tests`:
+/overrides.mk
+/tmp_runtime_tests_snowball_data/
+#
+/algorithms.mk
+/snowball
+/stemtest
+/dist
+# Ada
+/ada/algorithms/
+/ada/bin/
+/ada/obj/
+# C
+/libstemmer/libstemmer.c
+/libstemmer/libstemmer_utf8.c
+/libstemmer/mkinc.mak
+/libstemmer/mkinc_utf8.mak
+/libstemmer/modules.h
+/libstemmer/modules_utf8.h
+/libstemmer.a
+/src_c
+/stemwords
+# C#
+/csharp_stemwords
+/csharp/Snowball/Algorithms/*.generated.cs
+# Dart
+/dart/lib/ext/
+/dart/lib/src/algorithms.dart
+# Go
+/go/algorithms/
+/go/stemwords/algorithms.go
+# Java
+/java/org/tartarus/snowball/ext/
+/java/org/tartarus/snowball/*.class
+# JS
+/js_out
+# PHP
+/php_out
+# Python
+/python_check
+/python_out
+# Rust
+/rust/Cargo.lock
+/rust/src/snowball/algorithms/*.rs
+/rust/target/
+# Zig
+/zig/*_stemmer.zig
+/zig/algorithms.zig
+/zig/stemwords

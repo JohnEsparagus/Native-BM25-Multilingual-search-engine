@@ -1,0 +1,82 @@
+// Test integer tests.
+externals (stem)
+routines (var_local_bug var_local_bug_)
+integers (x y var_local_bug_a var_local_bug_b)
+routines (recursive_var_local_bug recursive_var_local_bug_)
+integers (recursive_x)
+booleans (reentered)
+define stem as (
+  var_local_bug
+
+  unset reentered
+  test recursive_var_local_bug or fail='variable incorrectly localised into recursive routine'
+
+  $x = len
+
+  $x == 2 or fail='== failed (old style)'
+  $(x == 2) or fail='== failed'
+  $(2 == x) or fail='== failed (reversed)'
+
+  $x != 3 or fail='!= failed (old style)'
+  $(x != 3) or fail='!= failed'
+  $(3 != x) or fail='!= failed (reversed)'
+
+  $x >= 2 or fail='>= failed (old style)'
+  $(x >= 2) or fail='>= failed'
+  $(x >= 1) or fail='>= failed (nonequal)'
+  $(2 >= x) or fail='>= failed (reversed)'
+  $(3 >= x) or fail='>= failed (nonequal, reversed)'
+
+  $x <= 2 or fail='<= failed (old style)'
+  $(x <= 2) or fail='<= failed'
+  $(x <= 3) or fail='<= failed (nonequal)'
+  $(2 <= x) or fail='<= failed (reversed)'
+  $(1 <= x) or fail='<= failed (nonequal, reversed)'
+
+  $x > 1 or fail='> failed (old style)'
+  $(x > 1) or fail='> failed'
+  $(3 > x) or fail='> failed (nonequal, reversed)'
+
+  $x < 3 or fail='< failed (old style)'
+  $(x < 3) or fail='< failed'
+  $(1 < x) or fail='< failed (reversed)'
+)
+
+// Regression test for bug in fixed in 3.1.1 - the variable localisation
+// machinery failed to look at the rhs of integer tests.
+define var_local_bug as (
+  $var_local_bug_a = 0
+  var_local_bug_
+  $var_local_bug_a = 1
+  var_local_bug_
+)
+
+define var_local_bug_ as (
+  do (
+    $(var_local_bug_a == 1)
+    // The bug was that this use before set was not spotted.
+    $(7 != var_local_bug_b)
+    ['a'] delete
+  )
+  do (
+    $(var_local_bug_a == 0)
+    $var_local_bug_b = 7
+  )
+  $(7 == var_local_bug_b) or fail='var_local_bug_b was incorrectly localised'
+)
+
+define recursive_var_local_bug as (
+  $recursive_x = 0
+  reentered or (
+    set reentered
+    $recursive_x = 1
+    recursive_var_local_bug_
+    // `recursive_x` should get set back to 0 by the recursive call, but if it
+    // gets localised it will still have value 1.
+    $(recursive_x == 0)
+  )
+)
+
+define recursive_var_local_bug_ as (
+  recursive_var_local_bug
+)
