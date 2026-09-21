@@ -25,8 +25,10 @@ target_include_directories(
     PRIVATE
     src
     ${CMAKE_SOURCE_DIR}/third_party/snowball/include
+    ${CMAKE_SOURCE_DIR}/third_party/cppjieba/include
+
 )
 
-target_link_libraries(BM25-Multilingual PRIVATE  
-${CMAKE_SOURCE_DIR}/third_party/snowball/libstemmer.a )
-
+target_link_libraries(BM25-Multilingual PRIVATE
+    ${CMAKE_SOURCE_DIR}/third_party/snowball/libstemmer.a
+)

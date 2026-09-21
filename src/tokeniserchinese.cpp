@@ -1,12 +1,19 @@
-#include "/headers/tokeniserchinese.hpp"
+#include "headers/tokeniserchinese.hpp"
 
-int main(){
+std::vector<std::string> tokenise_chinese(const std::string& doc){
     cppjieba::Jieba jieba(
-        "cppjieba/dict/jieba.dict.utf8",
-        "cppjieba/dict/hmm_model.utf8",
-        "cppjieba/dict/user.dict.utf8",
-        "cppjieba/dict/idf.utf8",
-        "cppjieba/dict/stop_words.utf8"
+        "third_party/cppjieba/dict/jieba.dict.utf8",
+        "third_party/cppjieba/dict/hmm_model.utf8",
+        "third_party/cppjieba/dict/user.dict.utf8",
+        "third_party/cppjieba/dict/idf.utf8",
+        "third_party/cppjieba/dict/stop_words.utf8"
     );
+
+    //input doc inside....
+    std::vector<std::string> tokens;
+    
+
+    jieba.Cut(doc, tokens, true);
+    return tokens;
 
 }

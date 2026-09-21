@@ -20,6 +20,7 @@ int main(){
     char choice = 0;
 
     while (std::cin>>choice && (choice < '1' || choice > '3')){
+    
         std::cout<<"Invalid input, choose between the following:\n 1 (English),\n 2 (Chinese),\n 3 (Arabic)";
     }
 
@@ -32,14 +33,20 @@ int main(){
     if (choice == '1'){
         path /= "english_docs";
         index_path = index_path_english;
+        engine.set_language(Language::English);
+
     } else if (choice == '2'){
         path /= "chinese_docs";
         index_path = index_path_chinese;
+        engine.set_language(Language::Chinese);
 
     } else if (choice == '3'){
         path /= "arabic_docs";
         index_path = index_path_arabic;
+        engine.set_language(Language::Arabic);
+
     }
+
 
     
     if (std::filesystem::exists(index_path) && !std::filesystem::is_empty(index_path))// && Storage::is_valid_index(index_path) doesnt work idk why
@@ -55,9 +62,10 @@ int main(){
         loader.load_codex(path, engine);
         Storage::save(engine, index_path);
         }
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     std::string input;
 
-    std::cin.ignore();
     while (true) {
         std::cout << "Enter something: ";
         std::getline(std::cin, input); 

@@ -1,5 +1,6 @@
 #include "headers/document.hpp"
 #include "headers/tokeniser.hpp"
+#include "headers/tokeniserchinese.hpp"
 
 Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id, std::string title){
     id = doc_id;
@@ -14,8 +15,14 @@ Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id, s
 void Engine::add_doc(const std::string& text, std::string title)
 {
     size_t new_id  = docs_.size();
-    
-    std::vector<std::string> tokens = tokenise_and_stem(text); //std vec string
+    std::vector<std::string> tokens;
+
+    if (this->current_language == Language::English ){
+        tokens = tokenise_and_stem(text); //std vec string
+    } else if (this->current_language == Language::Chinese ){
+        tokens = tokenise_chinese(text);
+    }
+
     std::vector<std::string_view> tokens_view(tokens.begin(), tokens.end());
 
     docs_.emplace_back(std::move(tokens_view), new_id, std::move(title));
@@ -104,8 +111,12 @@ void Engine::print_query(const std::string& query_text) const
     std::vector<double> Engine::query(const std::string &query_text) const
 {
     Scorer scorer(index_);
-    std::vector<std::string> tokens = tokenise_and_stem(query_text);
-    
+    std::vector<std::string> tokens ;
+        if (this->current_language == Language::English ){
+        tokens = tokenise_and_stem(query_text); //std vec string
+    } else if (this->current_language == Language::Chinese ){
+        tokens = tokenise_chinese(query_text);
+    }
 
     std::vector<double> scores(index_.total_docs(),0.0);
 

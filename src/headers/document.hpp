@@ -8,6 +8,12 @@
 #include <fstream>
 #include <algorithm>
 
+enum class Language {
+    English,
+    Chinese,
+    Arabic
+};
+
 struct Posting{
     size_t doc_id;
     size_t term_freq;
@@ -37,6 +43,7 @@ struct InvertedIndex{
         return static_cast<double>(total_len) / doc_len.size();
     }
     void add_doc(const Document& doc);
+    
     size_t get_doc_freq(const std::string& term) const;
     const std::vector<Posting>* get_postings(const std::string& term) const;
 
@@ -62,11 +69,11 @@ struct Scorer{
 class Engine{
 public:
 
-
     size_t total_docs() const { return docs_.size();}
     double average_doc_len()const {return index_.get_avg_doc_len();}
 
     void add_doc(const std::string& text, std::string title);
+
     const std::string& title_of(size_t doc_id) const { return docs_[doc_id].title; }
 
     void build_index(std::vector<std::string>& corpus);
@@ -85,10 +92,15 @@ public:
     std::vector<Document>& documents() {return docs_;}
     const std::vector<Document>& documents() const {return docs_;}
 
+    void set_language(Language lang){
+        current_language = lang;
+    }
+
     private:
     std::vector<Document> docs_;
     InvertedIndex index_; 
 
+    Language current_language = Language::English; //default
 
 };
 
