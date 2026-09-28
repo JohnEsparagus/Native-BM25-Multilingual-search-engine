@@ -14,6 +14,11 @@ enum class Language {
     Arabic
 };
 
+struct SearchResult{
+    size_t doc_id;
+    double score;
+};
+
 struct Posting{
     size_t doc_id;
     size_t term_freq;
@@ -83,7 +88,7 @@ public:
 
     void print_query(const std::string &query_text) const;
 
-    std::vector<double> query(const std::string& query_text) const;
+    std::vector<SearchResult> query(const std::string& query_text) const;
 
     //getters
     InvertedIndex& index(){return index_;}

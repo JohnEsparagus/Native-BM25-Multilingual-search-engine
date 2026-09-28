@@ -1,5 +1,6 @@
 #include "headers/bm25.hpp"
 #include "headers/document.hpp"
+#include "headers/evaluation.hpp"  
 
 std::vector<std::string> corpus = {
     "The quick brown fox jumps over the lazy dog",
@@ -62,7 +63,26 @@ int main(){
         loader.load_codex(path, engine);
         Storage::save(engine, index_path);
         }
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        //eval
+    std::vector<EvalQuery> eval_queries = {
+        {"castle",   {0}},
+        {"monster",  {6,2}},
+        {"marriage", {7,0,2}},
+    };
+
+    {
+        const size_t K = 10;
+        EvalReport rep = evaluate(engine, eval_queries, K);
+
+        std::cout << "\n========== Evaluation ==========\n\n";
+        std::cout << "Queries:    " << rep.num_queries << "\n";
+        std::cout << "Recall@" << rep.k << ":  " << rep.recall_at_k << "\n";
+        std::cout << "MRR:        " << rep.mrr << "\n";
+        std::cout << "================================\n\n";
+    }
+    // ----- end eval mode -----
 
     std::string input;
 

@@ -1,6 +1,7 @@
 #include "headers/document.hpp"
 #include "headers/tokeniser.hpp"
 #include "headers/tokeniserchinese.hpp"
+#include "headers/tokeniserarabic.hpp"
 
 Document::Document(const std::vector<std::string_view>& tokens, size_t doc_id, std::string title){
     id = doc_id;
@@ -83,32 +84,22 @@ void Engine::clear(){
 void Engine::print_query(const std::string& query_text) const
 {
 
-    auto scores = query(query_text);
+    auto results = query(query_text);
     
 
     std::cout << "\n=== Query ===\n";
     std::cout << "Query: \"" << query_text << "\"\n\n";
 
-    //radix sort
-
-    std::sort(scores.begin(), scores.end(), std::greater<double>());
-    //radix sort scores
-    //sort results
-
-
-    //sort results
-
-    for (size_t id = 0; id < scores.size(); ++id) {
-        if (scores[id] > 0.0) {
-            std::cout << title_of(id)
-                      << " (Doc " << id << ")"
-                      << " -> Score: " << scores[id] << '\n';
-        }
+    for (const auto& r : results) {
+        std::cout << title_of(r.doc_id)
+                    << " (Doc " << r.doc_id << ")"
+                    << " -> Score: " << r.score << '\n';
+    
     }
 
     std::cout << "=====================\n";
 }
-    std::vector<double> Engine::query(const std::string &query_text) const
+    std::vector<SearchResult> Engine::query(const std::string &query_text) const
 {
     Scorer scorer(index_);
     std::vector<std::string> tokens ;
@@ -116,6 +107,8 @@ void Engine::print_query(const std::string& query_text) const
         tokens = tokenise_and_stem(query_text); //std vec string
     } else if (this->current_language == Language::Chinese ){
         tokens = tokenise_chinese(query_text);
+    }else if (this->current_language == Language::Arabic ){
+        tokens = tokenise_arabic(query_text);
     }
 
     std::vector<double> scores(index_.total_docs(),0.0);
@@ -131,8 +124,22 @@ void Engine::print_query(const std::string& query_text) const
             scores[id] += scorer.score_term(token, freq, index_.doc_len[id]);
         }
     }
-    
-    return scores;
+
+    std::vector<SearchResult> results;
+    results.reserve(scores.size());
+
+    for (size_t id = 0; id < scores.size(); id++){
+        if (scores[id] > 0.0){
+            results.push_back({id, scores[id]});
+        }
+    }
+
+  std::sort(results.begin(), results.end(),
+              [](const SearchResult& a, const SearchResult& b) {
+                  return a.score > b.score;
+              });
+
+    return results;
 }
 
 void InvertedIndex::clear()
