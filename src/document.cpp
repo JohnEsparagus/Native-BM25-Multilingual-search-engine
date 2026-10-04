@@ -212,10 +212,23 @@ namespace fs = std::filesystem;
 void TextLoader::load_codex(std::filesystem::path& path, Engine& engine) {
     try {
         if (fs::exists(path) && fs::is_directory(path)){
+
+            std::vector<fs::path> files;
             for (const auto& text :fs::directory_iterator(path)){
-                
                 if (fs::is_regular_file(text.path())){
-                    std::ifstream file(text.path(), std::ios::binary | std::ios::ate);
+                    files.push_back(text.path());
+                }
+
+                std::sort(files.begin(), files.end());
+
+            }
+
+            for (const auto& text : files){
+
+
+                
+                if (fs::is_regular_file(text)){
+                    std::ifstream file(text, std::ios::binary | std::ios::ate);
 
                     if (file.is_open()){
                         //fill the vector
@@ -224,7 +237,7 @@ void TextLoader::load_codex(std::filesystem::path& path, Engine& engine) {
                         content.resize(size);
                         file.seekg(0, std::ios::beg);
                         if (file.read(content.data(), size)){
-                            engine.add_doc(content, text.path().filename().string());
+                            engine.add_doc(content, text.filename().string());
                         }
                     }
                     else{

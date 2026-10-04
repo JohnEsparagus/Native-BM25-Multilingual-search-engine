@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "document.hpp"   // for SearchResult, Engine, Language
+#include "document.hpp"
 
 struct EvalQuery {
     std::string query;
-    std::vector<size_t> relevant_docs;   // ground-truth doc ids
+    std::vector<std::string> relevant_docs;   // filenames, not IDs
 };
 
 struct EvalReport {
@@ -15,7 +15,8 @@ struct EvalReport {
     double mrr         = 0.0;
 };
 
-// Runs each query through the engine, computes Recall@k and MRR, returns averages.
 EvalReport evaluate(const Engine& engine,
                     const std::vector<EvalQuery>& queries,
                     size_t k);
+
+std::vector<EvalQuery> load_eval_queries(const std::string& path);

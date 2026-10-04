@@ -1,0 +1,29 @@
+# query => relevant filenames separated by |
+# lines starting with # are ignored
+
+# --- single-book, distinctive names (easy) ---
+Raskolnikov => Crime and Punishment.txt
+Ahab => Moby Dick; Or, The Whale.txt
+Queequeg => Moby Dick; Or, The Whale.txt
+Darcy => Pride_and_Prejudice.txt
+Pemberley => Pride_and_Prejudice.txt
+Montoni => The Mysteries of Udolpho.txt
+Odysseus => The Odyssey.txt
+Penelope => The Odyssey.txt
+Cyclops => The Odyssey.txt
+Carmen => Carmen.txt
+Herzoguvia => The Secret of Chimneys.txt
+
+# --- themes (harder, may span books) ---
+whale => Moby Dick; Or, The Whale.txt
+harpoon => Moby Dick; Or, The Whale.txt
+castle => The Mysteries of Udolpho.txt
+suitors => The Odyssey.txt | Pride_and_Prejudice.txt
+marriage => Pride_and_Prejudice.txt | The Mysteries of Udolpho.txt
+murder => Crime and Punishment.txt | The Secret of Chimneys.txt | The Mysteries of Udolpho.txt
+pawnbroker => Crime and Punishment.txt
+smuggler => Carmen.txt
+bandits => Carmen.txt | The Mysteries of Udolpho.txt
+ship => Moby Dick; Or, The Whale.txt | The Sailor's Word-Book.txt | The Odyssey.txt
+anchor => The Sailor's Word-Book.txt | Moby Dick; Or, The Whale.txt | Chambers's Twentieth Century Dictionary (part 1 of 4: A-D).txt
+rigging => The Sailor's Word-Book.txt | Moby Dick; Or, The Whale.txt

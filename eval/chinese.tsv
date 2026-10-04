@@ -1,0 +1,57 @@
+# query => relevant filenames separated by |
+
+# --- 金瓶梅 ---
+西门庆 => jinpingmei-simplified.txt
+潘金莲 => jinpingmei-simplified.txt
+李瓶儿 => jinpingmei-simplified.txt
+吴月娘 => jinpingmei-simplified.txt
+庞春梅 => jinpingmei-simplified.txt
+应伯爵 => jinpingmei-simplified.txt
+武松 => jinpingmei-simplified.txt
+
+# --- 聊斋志异 ---
+聂小倩 => liaozhaizhiyi-simplified.txt
+宁采臣 => liaozhaizhiyi-simplified.txt
+画皮 => liaozhaizhiyi-simplified.txt
+异史氏 => liaozhaizhiyi-simplified.txt
+促织 => liaozhaizhiyi-simplified.txt
+席方平 => liaozhaizhiyi-simplified.txt
+狐 => liaozhaizhiyi-simplified.txt
+
+# --- 中庸 ---
+中庸 => zhongyong-simplified.txt
+慎独 => zhongyong-simplified.txt
+至诚 => zhongyong-simplified.txt
+喜怒哀乐 => zhongyong-simplified.txt
+
+# --- 古文观止 ---
+出师表 => guwenguanzhi-simplified.txt
+岳阳楼记 => guwenguanzhi-simplified.txt
+陋室铭 => guwenguanzhi-simplified.txt
+兰亭集序 => guwenguanzhi-simplified.txt
+醉翁亭记 => guwenguanzhi-simplified.txt
+桃花源记 => guwenguanzhi-simplified.txt
+郑伯克段于鄢 => guwenguanzhi-simplified.txt
+
+# --- 唐诗三百首 ---
+李白 => 唐诗三百首 — 孙洙.txt
+杜甫 => 唐诗三百首 — 孙洙.txt
+王维 => 唐诗三百首 — 孙洙.txt
+白居易 => 唐诗三百首 — 孙洙.txt
+李商隐 => 唐诗三百首 — 孙洙.txt
+孟浩然 => 唐诗三百首 — 孙洙.txt
+静夜思 => 唐诗三百首 — 孙洙.txt
+
+# --- 闲情偶寄 ---
+李渔 => 闲情偶寄.txt
+笠翁 => 闲情偶寄.txt
+词曲部 => 闲情偶寄.txt
+演习部 => 闲情偶寄.txt
+居室部 => 闲情偶寄.txt
+种植部 => 闲情偶寄.txt
+饮馔部 => 闲情偶寄.txt
+颐养部 => 闲情偶寄.txt
+
+# --- cross-book (harder) ---
+君子 => zhongyong-simplified.txt | guwenguanzhi-simplified.txt
+鬼 => liaozhaizhiyi-simplified.txt | 二刻拍案惊奇.txt

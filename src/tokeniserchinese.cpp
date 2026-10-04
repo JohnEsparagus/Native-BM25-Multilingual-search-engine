@@ -1,7 +1,7 @@
 #include "headers/tokeniserchinese.hpp"
 
 std::vector<std::string> tokenise_chinese(const std::string& doc){
-    cppjieba::Jieba jieba(
+    static cppjieba::Jieba jieba(
         "third_party/cppjieba/dict/jieba.dict.utf8",
         "third_party/cppjieba/dict/hmm_model.utf8",
         "third_party/cppjieba/dict/user.dict.utf8",
