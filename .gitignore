@@ -1,25 +1,105 @@
-# Build
+# =========================
+# Build / CMake
+# =========================
 build/
-cmake-build-debug/
-cmake-build-release/
-
-# Compiled binaries
-*.o
-*.a
-*.so
-*.out
-
-# CMake generated
-CMakeCache.txt
+build-*/
+cmake-build-*/
 CMakeFiles/
+CMakeCache.txt
 cmake_install.cmake
 Makefile
+compile_commands.json
+CTestTestfile.cmake
+Testing/
 
-# Editor
+# Generated binaries / libraries
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# IDEs / Editors
+# =========================
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
 
-*.txt
+# =========================
+# Python tooling
+# =========================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =========================
+# ML / Model files
+# =========================
+models/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+
+# =========================
+# Large datasets / corpora
+# =========================
+data/raw/
+data/processed/
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# =========================
+# Local experiment outputs
+# =========================
+experiments/results/
+experiments/outputs/
+logs/
+*.log
+
+# =========================
+# Secrets / environment
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
