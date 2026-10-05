@@ -1,19 +1,27 @@
 #include "headers/tokeniserchinese.hpp"
+#include <filesystem>
+#include <stdexcept>
 
-std::vector<std::string> tokenise_chinese(const std::string& doc){
+#ifndef JIEBA_DICT_DIR
+#define JIEBA_DICT_DIR "third_party/cppjieba/dict"
+#endif
+
+static cppjieba::Jieba& get_jieba() {
+    const std::string dir = JIEBA_DICT_DIR;
+    if (!std::filesystem::exists(dir + "/jieba.dict.utf8"))
+        throw std::runtime_error("cppjieba dictionary not found in: " + dir);
+
     static cppjieba::Jieba jieba(
-        "third_party/cppjieba/dict/jieba.dict.utf8",
-        "third_party/cppjieba/dict/hmm_model.utf8",
-        "third_party/cppjieba/dict/user.dict.utf8",
-        "third_party/cppjieba/dict/idf.utf8",
-        "third_party/cppjieba/dict/stop_words.utf8"
-    );
+        dir + "/jieba.dict.utf8",
+        dir + "/hmm_model.utf8",
+        dir + "/user.dict.utf8",
+        dir + "/idf.utf8",
+        dir + "/stop_words.utf8");
+    return jieba;
+}
 
-    //input doc inside....
+std::vector<std::string> tokenise_chinese(const std::string& doc) {
     std::vector<std::string> tokens;
-    
-
-    jieba.Cut(doc, tokens, true);
+    get_jieba().Cut(doc, tokens, true);
     return tokens;
-
 }
