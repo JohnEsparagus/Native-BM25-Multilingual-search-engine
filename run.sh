@@ -38,7 +38,12 @@ if [ "$1" == "python" ]; then
     echo "Import check..."
     PYTHONPATH="$PY_BUILD_DIR/python" python -c \
         "from multilingual_search import SearchEngine; print(SearchEngine())"
+
+    if [ "$2" == "-x" ]; then
+        PYTHONPATH="$PY_BUILD_DIR/python" python src/python/test.py
+    fi
     exit 0
+
 fi
 
 # ---------------------------------------------------------------
