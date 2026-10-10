@@ -31,6 +31,21 @@ def test_chinese_search():
 
     assert engine.search("完全不存在的词语") == []
     
+def test_arabic_search():
+    engine = SearchEngine("arabic")
+    engine.add_document("ذهب الولد إلى المدرسة، وقرأ الكتاب.", "school")
+    engine.add_document("الطقس جميل اليوم في المدينة", "weather")
+
+    # punctuation is stripped and the definite article / diacritics are stemmed away
+    assert [r.title for r in engine.search("كتاب")] == ["school"]
+    assert [r.title for r in engine.search("المَدْرَسَة")] == ["school"]
+    assert [r.title for r in engine.search("طقس")] == ["weather"]
+
+    # stopwords are not indexed
+    assert engine.search("في") == []
+    assert engine.search("apple") == []
+
+
 def test_stemming_and_no_match():
     engine = make_engine()
     assert [r.title for r in engine.search("whales")] == ["moby_dick"]

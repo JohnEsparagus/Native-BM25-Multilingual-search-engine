@@ -5,8 +5,8 @@
 
 class Stemmer{
 public:
-    Stemmer(){
-        stemmer = sb_stemmer_new("english", "UTF_8");
+    explicit Stemmer(const char* language = "english"){
+        stemmer = sb_stemmer_new(language, "UTF_8");
     }
 
     ~Stemmer(){

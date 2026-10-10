@@ -22,6 +22,8 @@ void Engine::add_doc(const std::string& text, std::string title)
         tokens = tokenise_and_stem(text); //std vec string
     } else if (this->current_language == Language::Chinese ){
         tokens = tokenise_chinese(text);
+    } else if (this->current_language == Language::Arabic ){
+        tokens = tokenise_arabic(text);
     }
 
     std::vector<std::string_view> tokens_view(tokens.begin(), tokens.end());

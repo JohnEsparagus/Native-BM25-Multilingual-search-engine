@@ -1,7 +1,7 @@
 # Native-BM25-Multilingual-search-engine
 
 
-C++20 BM25 search engine (English, Chinese; Arabic is a stub) with an optional pybind11 Python interface.
+C++20 BM25 search engine (English, Chinese, Arabic) with an optional pybind11 Python interface.
 
 ## Prerequisites
 - C++20 compiler, CMake >= 3.18, Python >= 3.8
