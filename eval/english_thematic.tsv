@@ -1,0 +1,20 @@
+# query => relevant filenames separated by |
+# thematic queries: describe the book without naming its characters
+
+a poor student kills an old woman and is tormented by guilt => Crime and Punishment.txt
+a detective slowly pushes a guilty man to confess => Crime and Punishment.txt
+a captain obsessed with revenge on the animal that took his leg => Moby Dick; Or, The Whale.txt
+life aboard a whaling voyage => Moby Dick; Or, The Whale.txt
+a proud wealthy gentleman falls in love with a witty young woman => Pride_and_Prejudice.txt
+a mother anxious to find husbands for her five daughters => Pride_and_Prejudice.txt
+an orphaned young woman held in a gloomy fortress by a cruel guardian => The Mysteries of Udolpho.txt
+strange noises and apparitions in a remote mountain stronghold => The Mysteries of Udolpho.txt
+a hero's long journey home after the war => The Odyssey.txt
+a wife waits faithfully for her husband while men try to take his place => The Odyssey.txt
+a soldier ruined by his passion for a gypsy woman => Carmen.txt
+jealousy and a killing in Spain => Carmen.txt
+a missing jewel and political intrigue at an English country house => The Secret of Chimneys.txt
+an adventurer agrees to deliver a manuscript and is drawn into a conspiracy => The Secret of Chimneys.txt
+explanations of nautical terms => The Sailor's Word-Book.txt
+vocabulary used by seamen => The Sailor's Word-Book.txt
+definitions and origins of words in alphabetical order => Chambers's Twentieth Century Dictionary (part 1 of 4: A-D).txt

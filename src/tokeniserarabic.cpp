@@ -6,9 +6,8 @@ static const std::unordered_set<std::string> Arabic_stopwords = {
     "في", "من", "على", "إلى", "الى", "عن", "مع", "أن", "ان", "إن", "أو", "او",
     "و", "ثم", "ما", "لا", "لم", "لن", "قد", "كل", "هو", "هي", "هم",
     "هذا", "هذه", "ذلك", "تلك", "التي", "الذي", "الذين", "كان", "كانت"
-};
+}; 
 
-// Arabic punctuation is multi-byte in UTF-8, so blank it out before splitting.
 static void strip_arabic_punctuation(std::string& text){
     static const std::string punctuation[] = {"،", "؛", "؟", "«", "»", "٪", "۔"};
     for (const auto& p : punctuation){
@@ -19,8 +18,7 @@ static void strip_arabic_punctuation(std::string& text){
 }
 
 std::vector<std::string> tokenise_arabic(const std::string& doc){
-    // The Snowball Arabic stemmer also strips diacritics and tatweel and
-    // normalises the alef/hamza forms, so no separate normalisation pass.
+    // snowball stemmer deals wiht diacrtiics and everything difficult abt arabic stemming.
     Stemmer stemmer("arabic");
     std::string text = doc;
     strip_arabic_punctuation(text);

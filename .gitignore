@@ -103,3 +103,5 @@ logs/
 # =========================
 .DS_Store
 Thumbs.db
+# cached passage embeddings
+storage/embeddings_*.npy

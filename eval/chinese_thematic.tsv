@@ -1,0 +1,18 @@
+# query => relevant filenames separated by |
+# thematic queries: describe the book without naming its characters
+
+富商纵情声色，妻妾之间争风吃醋 => jinpingmei-simplified.txt
+一个大户人家由盛转衰的市井故事 => jinpingmei-simplified.txt
+书生与狐仙女鬼相恋的奇异故事 => liaozhaizhiyi-simplified.txt
+借鬼怪讽刺官场和科举 => liaozhaizhiyi-simplified.txt
+儒家讲修身养性与不偏不倚的道理 => zhongyong-simplified.txt
+历代散文名篇选集 => guwenguanzhi-simplified.txt
+古代臣子劝谏君主的文章 => guwenguanzhi-simplified.txt
+唐代诗人写的绝句和律诗 => 唐诗三百首 — 孙洙.txt
+思念故乡和送别友人的诗 => 唐诗三百首 — 孙洙.txt
+怎样写戏曲和指导演员表演 => 闲情偶寄.txt
+园林房屋的布置与饮食养生的心得 => 闲情偶寄.txt
+明代白话短篇小说，讲因果报应和世态人情 => 二刻拍案惊奇.txt
+贪心残暴的大王欺压百姓的童话 => bald_king.txt
+每天早晚诵读的圣经经文 => 灵历集光.txt
+关于上帝的恩典与信心的话语 => 灵历集光.txt

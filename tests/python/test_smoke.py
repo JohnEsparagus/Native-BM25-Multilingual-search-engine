@@ -36,12 +36,10 @@ def test_arabic_search():
     engine.add_document("ذهب الولد إلى المدرسة، وقرأ الكتاب.", "school")
     engine.add_document("الطقس جميل اليوم في المدينة", "weather")
 
-    # punctuation is stripped and the definite article / diacritics are stemmed away
     assert [r.title for r in engine.search("كتاب")] == ["school"]
     assert [r.title for r in engine.search("المَدْرَسَة")] == ["school"]
     assert [r.title for r in engine.search("طقس")] == ["weather"]
 
-    # stopwords are not indexed
     assert engine.search("في") == []
     assert engine.search("apple") == []
 
