@@ -69,3 +69,11 @@ docker run -p 8000:8000 -v bm25-corpus:/app/corpus -v bm25-storage:/app/storage 
 The image compiles the engine, downloads the dense model and embeds the corpus at build time, so the container runs offline. The two volumes keep documents you add through the page.
 
 To use a different cppjieba dictionary location at runtime, set `JIEBA_DICT_DIR`.
+
+## AI assistance
+I used AI for some parts of this project:
+- All of the CSS in `web/index.html`.
+- `AI_summary.md`, which is an AI-written summary of my evaluation results. My own notes are in `research.md`.
+- Help with the pybind11 bindings in `bindings/`.
+- Saving and loading the index to disk (`src/Storage.cpp`).
+- The evaluation framework and the tests.
