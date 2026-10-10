@@ -9,6 +9,7 @@ A from-scratch C++ BM25 engine was compared against a multilingual dense embeddi
 - On queries that are **names or specific terms**, BM25 beat dense retrieval in all three languages.
 - On **thematic queries** that describe a book without using its words, dense retrieval won clearly in English, narrowly in Chinese, and lost to BM25 in Arabic.
 - **Hybrid** had the best or joint-best Recall@3 in every one of the six tests. It was never the worst on MRR, but it was the best on MRR in only two.
+- **Cross-lingual search** works with dense retrieval alone: one query searches all three languages. In a spot check it found the right book for descriptive queries in another language, and failed on names. It has not been measured with an evaluation set.
 
 The test is small (8–9 books and 15–42 queries per set), so these are indications, not benchmarks.
 
@@ -95,6 +96,27 @@ Reciprocal rank for BM25 / Dense / Hybrid.
 - **Hybrid protects against the weaker ranker.** It stayed close to BM25 where dense failed and close to dense where BM25 failed, at the cost of not always matching the better one.
 - **Chinese BM25 returned no results for five name queries** (`庞春梅`, `王维`, `李商隐`, `李渔`, `慎独`). The cause has not been investigated; the name may be absent from the text or segmented differently in the query and the passage.
 
+## Cross-lingual retrieval
+
+A query in one language can retrieve passages written in another. This uses dense retrieval only.
+
+**How it works.** The dense model maps text from any of its languages into one shared vector space, so a passage and a query with the same meaning are close together whatever language each is in. The query is embedded once and compared against the passage embeddings of all three languages; the scores are cosine similarities from the same model, so they can be merged into a single ranking. No translation is involved. BM25 cannot do this, because it scores passages by the words they share with the query, and hybrid is unavailable for the same reason.
+
+**Spot check.** Eight queries were run against all 48,804 passages. This is a check that the feature works, not a measurement.
+
+| Query | Query language | Top result | Correct |
+|---|---|---|---|
+| a detective investigates a young woman followed by a man on a bicycle | English | مغامرة راكبة الدراجة في الطريق المهجور (Arabic) | yes |
+| the second caliph of Islam and his conquests | English | الفاروق عمر (Arabic) | yes |
+| proofs for the existence of God | English | الطبيعة وما بعد الطبيعة (Arabic) | yes |
+| `鲸鱼` (whale) | Chinese | Moby Dick (English) | yes |
+| whale | English | Moby Dick (English) | yes |
+| `狐仙和书生的爱情故事` (love stories of fox spirits and scholars) | Chinese | 二刻拍案惊奇 (Chinese); the expected 聊斋志异 was third | partly |
+| `الحوت الأبيض` (the white whale) | Arabic | Pride and Prejudice (English) | no |
+| Sherlock Holmes | English | The Secret of Chimneys (English), not the Arabic Holmes story | no |
+
+Five of the eight returned the expected book first. The longer descriptive queries carried across languages. Of the two failures, one was a name ("Sherlock Holmes" in Latin script did not match the same name in Arabic script), which fits the pattern in the single-language results. The other was a two-word Arabic phrase that should have matched Moby Dick and did not; the cause was not investigated.
+
 ## Limitations
 
 - The corpus is small: 8 or 9 books per language.
@@ -103,4 +125,5 @@ Reciprocal rank for BM25 / Dense / Hybrid.
 - Relevance is per book. A passage from the right book counts as correct even when that passage is not about the query.
 - One dense model was tested, with no tuning of k1, b, passage size or the fusion constants.
 - Two Chinese files begin with English Project Gutenberg licence text, so some Chinese passages are English boilerplate.
-- Passage sizes differ by language, so scores are not directly comparable across languages.
+- Passage sizes differ by language, so scores are not directly comparable across languages. This also affects the merged cross-lingual ranking: shorter Chinese passages and longer English ones are scored on the same scale.
+- Cross-lingual retrieval was checked with eight queries chosen by an AI assistant. There is no cross-lingual query set, so it has no Recall or MRR figure.
