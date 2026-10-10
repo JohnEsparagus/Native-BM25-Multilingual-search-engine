@@ -6,13 +6,27 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 option(BUILD_PYTHON_BINDINGS "Build the pybind11 Python extension" OFF)
+
+# libstemmer.a is not in the repo, build it from the snowball sources if it is missing
+set(SNOWBALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/snowball)
+add_custom_command(
+    OUTPUT ${SNOWBALL_DIR}/libstemmer.a
+    COMMAND make libstemmer.a "CFLAGS=-O2 -fPIC"
+    WORKING_DIRECTORY ${SNOWBALL_DIR}
+    VERBATIM)
+add_custom_target(snowball DEPENDS ${SNOWBALL_DIR}/libstemmer.a)
 
 file(GLOB_RECURSE CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/bm25.cpp")
 
 add_library(search_core STATIC ${CORE_SOURCES})
 set_target_properties(search_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_dependencies(search_core snowball)
 
 target_include_directories(search_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src

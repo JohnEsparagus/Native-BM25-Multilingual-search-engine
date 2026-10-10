@@ -1,0 +1,15 @@
+.git
+.venv
+.vscode
+.pytest_cache
+**/__pycache__
+build
+build-*
+docs
+storage/*.bin
+
+# host build leftovers, the image compiles its own
+**/*.o
+**/*.a
+third_party/snowball/snowball
+third_party/snowball/stemwords

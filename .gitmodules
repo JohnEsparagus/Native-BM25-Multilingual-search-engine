@@ -1,6 +1,0 @@
-[submodule "snowball"]
-	path = snowball
-	url = https://github.com/snowballstem/snowball
-[submodule "cppjieba"]
-	path = cppjieba
-	url = https://github.com/yanyiwu/cppjieba.git

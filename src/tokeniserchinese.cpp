@@ -1,4 +1,5 @@
 #include "headers/tokeniserchinese.hpp"
+#include <cstdlib>
 #include <filesystem>
 #include <stdexcept>
 
@@ -7,7 +8,9 @@
 #endif
 
 static cppjieba::Jieba& get_jieba() {
-    const std::string dir = JIEBA_DICT_DIR;
+    // JIEBA_DICT_DIR in the environment wins, so the binary still works after being moved
+    const char* env_dir = std::getenv("JIEBA_DICT_DIR");
+    const std::string dir = env_dir ? env_dir : JIEBA_DICT_DIR;
     if (!std::filesystem::exists(dir + "/jieba.dict.utf8"))
         throw std::runtime_error("cppjieba dictionary not found in: " + dir);
 

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BM25 / Hybrid Multilingual Retrieval</title>
+<style>
+  :root {
+    --bg: #f6f6f3; --card: #ffffff; --text: #1c1c1a; --muted: #6b6b66;
+    --line: #dddcd6; --accent: #1f5fbf;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161614; --card: #20201d; --text: #ecebe6; --muted: #9c9b94;
+      --line: #34342f; --accent: #7fb0ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px; background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1200px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 1.5rem; }
+  .sub { margin: 0 0 24px; color: var(--muted); }
+  form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  input, select, button {
+    font: inherit; padding: 10px 12px; border: 1px solid var(--line);
+    border-radius: 8px; background: var(--card); color: var(--text);
+  }
+  input { flex: 1; min-width: 200px; }
+  button { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  #status { min-height: 1.5em; margin: 0 0 16px; color: var(--muted); }
+  .columns { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  h2 { margin: 0 0 2px; font-size: 1.05rem; }
+  .how { margin: 0 0 12px; color: var(--muted); font-size: .875rem; }
+  .hit {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .book { font-weight: 600; font-size: .875rem; color: var(--accent); margin-bottom: 4px; overflow-wrap: anywhere; }
+  .text { font-size: .9rem; overflow-wrap: anywhere; }
+  .none { color: var(--muted); font-size: .9rem; }
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  summary { cursor: pointer; font-weight: 600; }
+  #docs { list-style: none; margin: 12px 0; padding: 0; }
+  #docs li {
+    display: flex; align-items: center; gap: 12px; padding: 6px 0;
+    border-top: 1px solid var(--line);
+  }
+  #docs .title { flex: 1; overflow-wrap: anywhere; }
+  #docs .count { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+  #docs button { background: none; color: var(--accent); padding: 4px 10px; }
+  .add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .add input { flex: 1; min-width: 200px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BM25 / Hybrid Multilingual Retrieval</h1>
+  <p class="sub">The same query through three rankers, side by side.</p>
+
+  <form id="form">
+    <input id="q" placeholder="Search the books..." autofocus>
+    <select id="language" aria-label="Language">
+      <option value="english">English</option>
+      <option value="chinese">Chinese</option>
+      <option value="arabic">Arabic</option>
+      <option value="all">All languages (dense only)</option>
+    </select>
+    <button id="go">Search</button>
+  </form>
+  <p id="status"></p>
+
+  <details>
+    <summary>Documents <span id="doc-count"></span></summary>
+    <ul id="docs"></ul>
+    <div class="add">
+      <input id="files" type="file" accept=".txt,text/plain" multiple aria-label="Text files to add">
+      <button id="add" type="button">Add to this language</button>
+    </div>
+  </details>
+
+  <div class="columns">
+    <section><h2>BM25</h2><p class="how">Exact words, C++ engine</p><div id="bm25"></div></section>
+    <section><h2>Dense</h2><p class="how">Meaning, sentence embeddings</p><div id="dense"></div></section>
+    <section><h2>Hybrid</h2><p class="how">Both, reciprocal rank fusion</p><div id="hybrid"></div></section>
+  </div>
+</main>
+
+<script>
+const form = document.getElementById("form");
+const status = document.getElementById("status");
+const go = document.getElementById("go");
+
+function render(id, hits) {
+  const box = document.getElementById(id);
+  box.replaceChildren();
+  if (hits === null || hits.length === 0) {
+    const p = document.createElement("p");
+    p.className = "none";
+    p.textContent = hits === null ? "Needs matching words, so it cannot search across languages." : "No results.";
+    box.append(p);
+    return;
+  }
+  for (const hit of hits) {
+    const card = document.createElement("div");
+    card.className = "hit";
+    const book = document.createElement("div");
+    book.className = "book";
+    book.dir = "auto";
+    book.textContent = hit.book.replace(/\.txt$/, "") + (hit.language ? ` (${hit.language})` : "");
+    const text = document.createElement("div");
+    text.className = "text";
+    text.dir = "auto";
+    text.textContent = hit.text;
+    card.append(book, text);
+    box.append(card);
+  }
+}
+
+const languageSelect = document.getElementById("language");
+const docList = document.getElementById("docs");
+const addButton = document.getElementById("add");
+const fileInput = document.getElementById("files");
+
+async function loadDocuments() {
+  const language = languageSelect.value;
+  addButton.disabled = language === "all";
+  if (language === "all") {
+    document.getElementById("doc-count").textContent = "(pick one language to manage)";
+    docList.replaceChildren();
+    return;
+  }
+  const response = await fetch(`/documents?language=${language}`);
+  const docs = await response.json();
+  document.getElementById("doc-count").textContent = `(${docs.length})`;
+  docList.replaceChildren();
+  for (const doc of docs) {
+    const item = document.createElement("li");
+    const title = document.createElement("span");
+    title.className = "title";
+    title.dir = "auto";
+    title.textContent = doc.title.replace(/\.txt$/, "");
+    const count = document.createElement("span");
+    count.className = "count";
+    count.textContent = `${doc.passages} passages`;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", () => removeDocument(language, doc.title));
+    item.append(title, count, remove);
+    docList.append(item);
+  }
+}
+
+async function removeDocument(language, title) {
+  if (!confirm(`Remove "${title}"? This deletes the file from the corpus folder.`)) return;
+  status.textContent = `Removing ${title}...`;
+  const response = await fetch(
+    `/documents?language=${language}&title=${encodeURIComponent(title)}`, { method: "DELETE" });
+  status.textContent = response.ok ? `Removed ${title}.` : `Could not remove ${title}.`;
+  await loadDocuments();
+}
+
+addButton.addEventListener("click", async () => {
+  const language = languageSelect.value;
+  const files = [...fileInput.files];
+  if (files.length === 0) {
+    status.textContent = "Choose one or more .txt files first.";
+    return;
+  }
+  addButton.disabled = true;
+  try {
+    for (const file of files) {
+      status.textContent = `Indexing ${file.name}... a full book can take a minute.`;
+      const response = await fetch("/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language, title: file.name, text: await file.text() }),
+      });
+      if (!response.ok) throw new Error(`${file.name}: server returned ${response.status}`);
+    }
+    status.textContent = `Added ${files.length} document${files.length === 1 ? "" : "s"}.`;
+    fileInput.value = "";
+  } catch (error) {
+    status.textContent = `Could not add: ${error.message}`;
+  } finally {
+    await loadDocuments();
+  }
+});
+
+languageSelect.addEventListener("change", loadDocuments);
+loadDocuments();
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const q = document.getElementById("q").value.trim();
+  if (!q) return;
+  const language = document.getElementById("language").value;
+
+  go.disabled = true;
+  status.textContent = "Searching... the first search in a language loads its index.";
+  try {
+    const response = await fetch(`/search?q=${encodeURIComponent(q)}&language=${language}`);
+    if (!response.ok) throw new Error(`Server returned ${response.status}`);
+    const data = await response.json();
+    render("bm25", data.bm25);
+    render("dense", data.dense);
+    render("hybrid", data.hybrid);
+    status.textContent = "";
+  } catch (error) {
+    status.textContent = `Search failed: ${error.message}`;
+  } finally {
+    go.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
