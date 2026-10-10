@@ -79,39 +79,38 @@ int main(){
     if (mode == '1'){
         
 
-    } else if (mode == '2'){
+    } else if (mode == '2') {
         std::string eval_path =
-        choice == '1' ? "eval/english.tsv" :
-        choice == '2' ? "eval/chinese.tsv" :
-                        "eval/arabic.tsv";
+            choice == '1' ? "eval/english.tsv" :
+            choice == '2' ? "eval/chinese.tsv" :
+                            "eval/arabic.tsv";
 
         auto eval_queries = load_eval_queries(eval_path);
+        if (eval_queries.empty()) {
+            std::cerr << "No eval queries loaded from " << eval_path << "\n";
+            return 1;
+        }
 
         // catch typos in filenames
         for (const auto& q : eval_queries)
-        for (const auto& name : q.relevant_docs) {
-            bool found = false;
-            for (const auto& d : engine.documents())
-                if (d.title == name) { found = true; break; }
-            if (!found) std::cerr << "Eval warning: unknown file '" << name
-                                    << "' in query '" << q.query << "'\n";
-        }
-
-        if (!eval_queries.empty()) {
-        EvalReport rep = evaluate(engine, eval_queries, 10);
+            for (const auto& name : q.relevant_docs) {
+                bool found = false;
+                for (const auto& d : engine.documents())
+                    if (d.title == name) { found = true; break; }
+                if (!found)
+                    std::cerr << "Eval warning: unknown file '" << name
+                            << "' in query '" << q.query << "'\n";
             }
-        {
-            const size_t K = 10;
-            EvalReport rep = evaluate(engine, eval_queries, K);
 
-            std::cout << "\n========== Evaluation ==========\n\n";
-            std::cout << "Queries:    " << rep.num_queries << "\n";
-            std::cout << "Recall@" << rep.k << ":  " << rep.recall_at_k << "\n";
-            std::cout << "MRR:        " << rep.mrr << "\n";
-            std::cout << "================================\n\n";
-        }
-        // ----- end eval mode -----
-        exit(-1);
+        const size_t K = 10;
+        EvalReport rep = evaluate(engine, eval_queries, K);
+
+        std::cout << "\n========== Evaluation ==========\n\n";
+        std::cout << "Queries:    " << rep.num_queries << "\n";
+        std::cout << "Recall@" << rep.k << ":  " << rep.recall_at_k << "\n";
+        std::cout << "MRR:        " << rep.mrr << "\n";
+        std::cout << "================================\n\n";
+        return 0;
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

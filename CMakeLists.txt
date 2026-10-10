@@ -21,6 +21,7 @@ target_include_directories(search_core PUBLIC
 )
 target_compile_definitions(search_core PRIVATE
     JIEBA_DICT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/third_party/cppjieba/dict")
+    
 target_link_libraries(search_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/snowball/libstemmer.a
 )

@@ -1,5 +1,6 @@
 #include "headers/tokeniser.hpp"
 
+
 std::string fast_lower(const std::string& doc){
     std::string out = doc; 
     for (char &c : out){

@@ -4,10 +4,11 @@ from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from qrels import load_qrels
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src" / "python"))            # for qrels
-sys.path.insert(0, str(ROOT / "build-python" / "python"))   # for multilingual_search.so         
+sys.path.insert(0, str(ROOT / "build-python" / "python")) 
+from qrels import load_qrels
+  # for multilingual_search.so         
 from multilingual_search import SearchEngine
 
 K = 10
