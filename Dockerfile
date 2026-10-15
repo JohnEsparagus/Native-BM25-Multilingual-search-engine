@@ -23,6 +23,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# keep the model cache inside /app so a non-root user (as on Hugging Face Spaces) can read it
+ENV HF_HOME=/app/.cache/huggingface
+
 # CPU-only torch, the default wheel pulls in several GB of CUDA libraries
 COPY requirements.txt .
 RUN pip install --no-cache-dir torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu \

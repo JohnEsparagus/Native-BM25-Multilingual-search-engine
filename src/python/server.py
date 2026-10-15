@@ -1,3 +1,4 @@
+import os
 import threading
 from collections import Counter
 from pathlib import Path
@@ -12,6 +13,14 @@ app = FastAPI(title="BM25 / Hybrid Multilingual Retrieval")
 
 searchers = {}
 lock = threading.Lock()
+
+# set READ_ONLY=1 on a public demo so visitors can search but not change the corpus
+READ_ONLY = os.environ.get("READ_ONLY") == "1"
+
+
+def check_editable():
+    if READ_ONLY:
+        raise HTTPException(403, "Adding and removing documents is turned off in this demo")
 
 
 def check_language(language):
@@ -39,6 +48,11 @@ def document_path(language, title):
 @app.get("/")
 def index():
     return FileResponse(ROOT / "web" / "index.html")
+
+
+@app.get("/settings")
+def settings():
+    return {"editable": not READ_ONLY}
 
 
 @app.get("/search")
@@ -78,6 +92,7 @@ class NewDocument(BaseModel):
 
 @app.post("/documents")
 def add_document(doc: NewDocument):
+    check_editable()
     check_language(doc.language)
     if not doc.text.strip():
         raise HTTPException(400, "Document is empty")
@@ -92,6 +107,7 @@ def add_document(doc: NewDocument):
 
 @app.delete("/documents")
 def remove_document(title: str, language: str = "english"):
+    check_editable()
     searcher = get_searcher(language)
     path = document_path(language, title)
     if not path.is_file():

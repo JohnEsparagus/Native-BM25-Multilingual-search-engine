@@ -57,6 +57,7 @@
   #docs button { background: none; color: var(--accent); padding: 4px 10px; }
   .add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .add input { flex: 1; min-width: 200px; }
+  .add[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -79,7 +80,7 @@
   <details>
     <summary>Documents <span id="doc-count"></span></summary>
     <ul id="docs"></ul>
-    <div class="add">
+    <div class="add" id="add-row">
       <input id="files" type="file" accept=".txt,text/plain" multiple aria-label="Text files to add">
       <button id="add" type="button">Add to this language</button>
     </div>
@@ -127,6 +128,7 @@ const languageSelect = document.getElementById("language");
 const docList = document.getElementById("docs");
 const addButton = document.getElementById("add");
 const fileInput = document.getElementById("files");
+let editable = true;
 
 async function loadDocuments() {
   const language = languageSelect.value;
@@ -153,7 +155,8 @@ async function loadDocuments() {
     remove.type = "button";
     remove.textContent = "Remove";
     remove.addEventListener("click", () => removeDocument(language, doc.title));
-    item.append(title, count, remove);
+    item.append(title, count);
+    if (editable) item.append(remove);
     docList.append(item);
   }
 }
@@ -195,7 +198,13 @@ addButton.addEventListener("click", async () => {
 });
 
 languageSelect.addEventListener("change", loadDocuments);
-loadDocuments();
+fetch("/settings")
+  .then((response) => response.json())
+  .then((settings) => {
+    editable = settings.editable;
+    document.getElementById("add-row").hidden = !editable;
+  })
+  .finally(loadDocuments);
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
