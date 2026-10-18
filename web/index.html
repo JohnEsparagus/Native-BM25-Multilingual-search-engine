@@ -58,6 +58,25 @@
   .add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .add input { flex: 1; min-width: 200px; }
   .add[hidden] { display: none; }
+  #chat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  #chat form { margin: 8px 0 0; }
+  #answer { white-space: pre-wrap; margin: 12px 0; }
+  #answer:empty { display: none; }
+  #sources .hit { margin-bottom: 6px; }
+  .ms { color: var(--muted); font-weight: 400; font-size: .85rem; }
+  .context { background: none; border: none; color: var(--accent); padding: 4px 0 0; font-size: .85rem; }
+  .text p { margin: 0 0 8px; }
+  .text mark { background: color-mix(in srgb, var(--accent) 20%, transparent); color: inherit; }
+  #paste { width: 100%; min-height: 140px; margin: 12px 0 8px; font: inherit; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: .9rem; }
+  th, td { text-align: left; padding: 6px 10px; border-top: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  #findings p { margin: 8px 0; }
 </style>
 </head>
 <body>
@@ -77,6 +96,17 @@
   </form>
   <p id="status"></p>
 
+  <section id="chat" hidden>
+    <h2>Ask the books</h2>
+    <p class="how">Claude answers from the top hybrid passages in the selected language, citing them like [1]</p>
+    <form id="chat-form">
+      <input id="question" placeholder="Ask a question..." maxlength="500">
+      <button id="ask">Ask</button>
+    </form>
+    <div id="answer" dir="auto"></div>
+    <div id="sources"></div>
+  </section>
+
   <details>
     <summary>Documents <span id="doc-count"></span></summary>
     <ul id="docs"></ul>
@@ -86,10 +116,57 @@
     </div>
   </details>
 
+  <details>
+    <summary>Try your own text</summary>
+    <p class="how">Paste up to 20,000 characters, type a query in the search box above, and search just this text.
+      It is indexed in memory and never added to the corpus.</p>
+    <textarea id="paste" maxlength="20000" dir="auto" placeholder="Paste English, Chinese or Arabic text..."></textarea>
+    <button id="search-paste" type="button">Search this text</button>
+  </details>
+
+  <details id="findings">
+    <summary>Findings</summary>
+    <p>Each query in the evaluation sets has a known right book. Books are split into passages, and each ranker's
+      passages are turned into a list of books.</p>
+    <p><b>Recall@3</b> is how often the right book appears in the top 3. <b>MRR</b> (mean reciprocal rank) rewards
+      putting it first: 1 if it is first, 0.5 if second, 0.33 if third, 0 if it is missing.</p>
+    <div class="scroll">
+      <table>
+        <tr><th>Language</th><th>Query set</th><th>Queries</th><th>Ranker</th><th>Recall@3</th><th>MRR</th></tr>
+        <tr><td>English</td><td>names/terms</td><td>23</td><td>BM25 (C++)</td><td>0.819</td><td>0.862</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>0.862</td><td>0.768</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>0.862</td><td>0.862</td></tr>
+        <tr><td>English</td><td>thematic</td><td>17</td><td>BM25 (C++)</td><td>0.765</td><td>0.637</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>1.000</td><td>0.912</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>1.000</td><td>0.873</td></tr>
+        <tr><td>Chinese</td><td>names/terms</td><td>42</td><td>BM25 (C++)</td><td>0.857</td><td>0.829</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>0.583</td><td>0.361</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>0.929</td><td>0.833</td></tr>
+        <tr><td>Chinese</td><td>thematic</td><td>15</td><td>BM25 (C++)</td><td>0.467</td><td>0.333</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>0.467</td><td>0.389</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>0.600</td><td>0.444</td></tr>
+        <tr><td>Arabic</td><td>names/terms</td><td>28</td><td>BM25 (C++)</td><td>1.000</td><td>0.964</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>0.643</td><td>0.548</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>1.000</td><td>0.958</td></tr>
+        <tr><td>Arabic</td><td>thematic</td><td>16</td><td>BM25 (C++)</td><td>0.875</td><td>0.844</td></tr>
+        <tr><td></td><td></td><td></td><td>Dense</td><td>0.812</td><td>0.708</td></tr>
+        <tr><td></td><td></td><td></td><td>Hybrid (RRF)</td><td>0.938</td><td>0.781</td></tr>
+      </table>
+    </div>
+    <p><b>Names and specific terms</b> (Queequeg, Odysseus, شيرلوك هولمز): BM25 is strongest, because the exact word
+      is in the right book. Dense often confuses names, especially in Arabic and Chinese.</p>
+    <p><b>Thematic queries</b> that describe a book without its words: dense wins clearly in English, where BM25 has no
+      words to match.</p>
+    <p><b>Hybrid</b> had the best or joint-best Recall@3 in all six tests, so it is the safest default.</p>
+    <p>The sets are small (8–9 books, 15–42 queries each), so these are indications, not benchmarks.</p>
+  </details>
+
+  <p class="how">Times are for ranking every passage in the selected books. Dense includes turning the query into
+    an embedding, and hybrid runs both rankers and then fuses their lists.</p>
   <div class="columns">
-    <section><h2>BM25</h2><p class="how">Exact words, C++ engine</p><div id="bm25"></div></section>
-    <section><h2>Dense</h2><p class="how">Meaning, sentence embeddings</p><div id="dense"></div></section>
-    <section><h2>Hybrid</h2><p class="how">Both, reciprocal rank fusion</p><div id="hybrid"></div></section>
+    <section><h2>BM25 <span class="ms" id="bm25-ms"></span></h2><p class="how">Exact words, C++ engine</p><div id="bm25"></div></section>
+    <section><h2>Dense <span class="ms" id="dense-ms"></span></h2><p class="how">Meaning, sentence embeddings</p><div id="dense"></div></section>
+    <section><h2>Hybrid <span class="ms" id="hybrid-ms"></span></h2><p class="how">Both, reciprocal rank fusion</p><div id="hybrid"></div></section>
   </div>
 </main>
 
@@ -98,7 +175,7 @@ const form = document.getElementById("form");
 const status = document.getElementById("status");
 const go = document.getElementById("go");
 
-function render(id, hits) {
+function render(id, hits, language) {
   const box = document.getElementById(id);
   box.replaceChildren();
   if (hits === null || hits.length === 0) {
@@ -120,7 +197,47 @@ function render(id, hits) {
     text.dir = "auto";
     text.textContent = hit.text;
     card.append(book, text);
+    const hitLanguage = hit.language ?? language;
+    if (hit.id !== undefined && hitLanguage) card.append(contextButton(text, hit, hitLanguage));
     box.append(card);
+  }
+}
+
+function contextButton(text, hit, language) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "context";
+  button.textContent = "Show in context";
+  button.addEventListener("click", async () => {
+    if (button.textContent === "Hide context") {
+      text.textContent = hit.text;
+      button.textContent = "Show in context";
+      return;
+    }
+    const response = await fetch(`/context?id=${hit.id}&language=${language}`);
+    if (!response.ok) return;
+    const { passages } = await response.json();
+    text.replaceChildren(...passages.map((passage) => {
+      const p = document.createElement("p");
+      if (passage.match) {
+        const mark = document.createElement("mark");
+        mark.textContent = passage.text;
+        p.append(mark);
+      } else {
+        p.textContent = passage.text;
+      }
+      return p;
+    }));
+    button.textContent = "Hide context";
+  });
+  return button;
+}
+
+function showResults(data, language) {
+  for (const name of ["bm25", "dense", "hybrid"]) {
+    render(name, data[name], language);
+    const ms = data.ms?.[name];
+    document.getElementById(`${name}-ms`).textContent = ms === undefined ? "" : `${ms} ms`;
   }
 }
 
@@ -203,6 +320,7 @@ fetch("/settings")
   .then((settings) => {
     editable = settings.editable;
     document.getElementById("add-row").hidden = !editable;
+    document.getElementById("chat").hidden = !settings.chat;
   })
   .finally(loadDocuments);
 
@@ -217,15 +335,90 @@ form.addEventListener("submit", async (event) => {
   try {
     const response = await fetch(`/search?q=${encodeURIComponent(q)}&language=${language}`);
     if (!response.ok) throw new Error(`Server returned ${response.status}`);
-    const data = await response.json();
-    render("bm25", data.bm25);
-    render("dense", data.dense);
-    render("hybrid", data.hybrid);
+    showResults(await response.json(), language);
     status.textContent = "";
   } catch (error) {
     status.textContent = `Search failed: ${error.message}`;
   } finally {
     go.disabled = false;
+  }
+});
+
+const chatForm = document.getElementById("chat-form");
+const ask = document.getElementById("ask");
+const answerBox = document.getElementById("answer");
+
+chatForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const q = document.getElementById("question").value.trim();
+  if (!q) return;
+
+  ask.disabled = true;
+  answerBox.textContent = "Searching and thinking...";
+  document.getElementById("sources").replaceChildren();
+  try {
+    const language = languageSelect.value;
+    const response = await fetch(`/chat?q=${encodeURIComponent(q)}&language=${language}`);
+    if (!response.ok) throw new Error((await response.json()).detail ?? `Server returned ${response.status}`);
+
+    // the first line is the passages as JSON, everything after it is the streamed answer
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let gotSources = false;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      if (!gotSources) {
+        const newline = buffer.indexOf("\n");
+        if (newline < 0) continue;
+        const hits = JSON.parse(buffer.slice(0, newline));
+        render("sources", hits.map((hit, n) => ({ ...hit, book: `[${n + 1}] ${hit.book}` })), language);
+        buffer = buffer.slice(newline + 1);
+        answerBox.textContent = "";
+        gotSources = true;
+      }
+      answerBox.textContent += buffer;
+      buffer = "";
+    }
+  } catch (error) {
+    answerBox.textContent = `Could not answer: ${error.message}`;
+  } finally {
+    ask.disabled = false;
+  }
+});
+
+const pasteButton = document.getElementById("search-paste");
+
+pasteButton.addEventListener("click", async () => {
+  const q = document.getElementById("q").value.trim();
+  const text = document.getElementById("paste").value;
+  const language = languageSelect.value;
+  if (!q || !text.trim()) {
+    status.textContent = "Paste some text and type a query in the search box first.";
+    return;
+  }
+  if (language === "all") {
+    status.textContent = "Pick the language of your text first.";
+    return;
+  }
+
+  pasteButton.disabled = true;
+  status.textContent = "Indexing and searching your text...";
+  try {
+    const response = await fetch("/sandbox", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ language, q, text }),
+    });
+    if (!response.ok) throw new Error(`Server returned ${response.status}`);
+    showResults(await response.json(), null);  // no context view, the text is not stored
+    status.textContent = "Results below are from your text only.";
+  } catch (error) {
+    status.textContent = `Search failed: ${error.message}`;
+  } finally {
+    pasteButton.disabled = false;
   }
 });
 </script>

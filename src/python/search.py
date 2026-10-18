@@ -100,6 +100,19 @@ class Searcher:
         return sorted(fused, key=fused.get, reverse=True)
 
 
+class TextSearcher(Searcher):
+    """Searches one pasted text in memory. Nothing is read from or written to the corpus or storage."""
+
+    def __init__(self, language, text, title="Your text"):
+        self.passages = chunk(text, CHUNK_CHARS[language])
+        self.passage_book = [title] * len(self.passages)
+        self.doc_emb = embed(self.passages) if self.passages else None
+
+        self.engine = SearchEngine(language)
+        for passage in self.passages:
+            self.engine.add_document(passage, title)
+
+
 def cross_lingual(searchers, q, k):
     q_emb = embed([q])[0]
     hits = []

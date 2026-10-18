@@ -40,7 +40,9 @@ COPY web web
 
 # Downloads the dense model and embeds every passage, so the container starts
 # ready and works offline. Embeddings already in storage/ are reused.
-RUN python src/python/search.py
+# The model is fetched on its own because search.py skips it when every book is already embedded.
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')" \
+    && python src/python/search.py
 ENV HF_HUB_OFFLINE=1
 
 EXPOSE 8000

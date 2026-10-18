@@ -59,6 +59,8 @@ Open http://localhost:8000 and search. Results from BM25, dense and hybrid are s
 
 Pick "All languages" to search every book with one query, in any language. This uses dense search only, since BM25 needs the query and the text to share words.
 
+Set `ANTHROPIC_API_KEY` before starting the server to turn on "Ask the books": Claude answers a question from the top hybrid passages and cites them.
+
 Open "Documents" on the page to add your own `.txt` files or remove books. Added files are saved in `corpus/<language>_docs/` and their embeddings in `storage/`, so they are still there after a restart.
 
 ## Docker

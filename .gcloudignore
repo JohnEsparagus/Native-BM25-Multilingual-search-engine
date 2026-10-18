@@ -1,0 +1,16 @@
+# files sent to Cloud Build by `gcloud run deploy --source .`
+# without this file gcloud falls back to .gitignore, which drops the English corpus and cached embeddings
+.gcloudignore
+.git
+.venv
+.vscode
+.pytest_cache
+**/__pycache__
+build
+build-*
+docs
+storage/*.bin
+**/*.o
+**/*.a
+third_party/snowball/snowball
+third_party/snowball/stemwords
